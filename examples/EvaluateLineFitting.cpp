@@ -1,4 +1,4 @@
-#include "RTL.hpp"
+#include "../rtl/RTL.hpp"
 #include <iostream>
 #include <fstream>
 
@@ -7,19 +7,20 @@ using namespace std;
 class ExpVar
 {
 public:
-    ExpVar() : dataNum(0), noiseLevel(0), inlierRate(0) { }
-    ExpVar(int num, double level, double rate) : dataNum(num), noiseLevel(level), inlierRate(rate) { }
+    ExpVar() : dataNum(0), noiseLevel(0), inlierRate(0) {}
+    ExpVar(int num, double level, double rate) : dataNum(num), noiseLevel(level), inlierRate(rate) {}
 
     int dataNum;
     double noiseLevel;
     double inlierRate;
 };
 
-typedef RTL::RANSAC<Line, Point, vector<Point> >* AlgoPtr;
+typedef RTL::RANSAC<Line, Point, vector<Point>> *AlgoPtr;
 
-bool RunRandomExp(const char* output, AlgoPtr algoPtr[], int algoNum, LineEstimator& estimator, Line truth, const ExpVar& expMax, const ExpVar& expMin, const ExpVar& expStep, int expTrial, bool verbose = true)
+bool RunRandomExp(const char *output, AlgoPtr algoPtr[], int algoNum, LineEstimator &estimator, Line truth, const ExpVar &expMax, const ExpVar &expMin, const ExpVar &expStep, int expTrial, bool verbose = true)
 {
-    if (output == NULL || algoPtr == NULL) return false;
+    if (output == NULL || algoPtr == NULL)
+        return false;
     ofstream record;
     record.open(output);
 
@@ -36,9 +37,11 @@ bool RunRandomExp(const char* output, AlgoPtr algoPtr[], int algoNum, LineEstima
                     vector<int> trueInliers;
                     LineObserver observer;
                     vector<Point> data = observer.GenerateData(truth, var.dataNum, trueInliers, var.noiseLevel, var.inlierRate);
-                    if (data.empty()) goto RUN_RANDOM_EXP_FAIL;
-                    Evaluator<Line, Point, vector<Point> > evaluator(&estimator);
-                    if (!evaluator.SetGroundTruth(truth, data, var.dataNum, trueInliers)) goto RUN_RANDOM_EXP_FAIL;
+                    if (data.empty())
+                        goto RUN_RANDOM_EXP_FAIL;
+                    Evaluator<Line, Point, vector<Point>> evaluator(&estimator);
+                    if (!evaluator.SetGroundTruth(truth, data, var.dataNum, trueInliers))
+                        goto RUN_RANDOM_EXP_FAIL;
 
                     for (int algoIndex = 0; algoIndex < algoNum; algoIndex++)
                     {
@@ -62,8 +65,8 @@ bool RunRandomExp(const char* output, AlgoPtr algoPtr[], int algoNum, LineEstima
                 if (verbose)
                     cout << var.dataNum << ", " << var.noiseLevel << ", " << var.inlierRate << endl;
             } // End of 'for (expVar.inlierRate)'
-        } // End of 'for (expVar.noiseLevel)'
-    } // End of 'for (expVar.dataNum)'
+        }     // End of 'for (expVar.noiseLevel)'
+    }         // End of 'for (expVar.dataNum)'
     record.close();
     return true;
 
@@ -75,29 +78,29 @@ RUN_RANDOM_EXP_FAIL:
 int main(void)
 {
     // Configure experiments
-    const Line   CONFIG_MODEL_TRUTH(0.6, 0.8, -300);
+    const Line CONFIG_MODEL_TRUTH(0.6, 0.8, -300);
     const ExpVar CONFIG_EXP_DEFAULT(200, 0.6, 0.5);
     const ExpVar CONFIG_EXP_MIN(100, 0.2, 0.1);
     const ExpVar CONFIG_EXP_MAX(1000, 2.0, 0.9);
     const ExpVar CONFIG_EXP_STEP(100, 0.2, 0.1);
-    const int    CONFIG_EXP_TRIAL = 1000;
-    const char*  CONFIG_EXP_NAME1 = "LineRandom(DataNum).csv";
-    const char*  CONFIG_EXP_NAME2 = "LineRandom(NoiseLevel).csv";
-    const char*  CONFIG_EXP_NAME3 = "LineRandom(InlierRate).csv";
+    const int CONFIG_EXP_TRIAL = 1000;
+    const char *CONFIG_EXP_NAME1 = "LineRandom(DataNum).csv";
+    const char *CONFIG_EXP_NAME2 = "LineRandom(NoiseLevel).csv";
+    const char *CONFIG_EXP_NAME3 = "LineRandom(InlierRate).csv";
 
     // Prepare algorithms
     LineEstimator estimator;
-    RTL::RANSAC<Line, Point, vector<Point> > ransac(&estimator);
-    RTL::LMedS<Line, Point, vector<Point> > lmeds(&estimator);
-    RTL::MSAC<Line, Point, vector<Point> > msac(&estimator);
-    RTL::MLESAC<Line, Point, vector<Point> > mlesac(&estimator);
+    RTL::RANSAC<Line, Point, vector<Point>> ransac(&estimator);
+    RTL::LMedS<Line, Point, vector<Point>> lmeds(&estimator);
+    RTL::MSAC<Line, Point, vector<Point>> msac(&estimator);
+    RTL::MLESAC<Line, Point, vector<Point>> mlesac(&estimator);
     AlgoPtr algorithms[] =
-    {
-        &ransac,
-        &lmeds,
-        &msac,
-        &mlesac,
-    };
+        {
+            &ransac,
+            &lmeds,
+            &msac,
+            &mlesac,
+        };
     const int ALGO_NUM = sizeof(algorithms) / sizeof(AlgoPtr);
 
     // Perform an experiment with varying 'dataNum'

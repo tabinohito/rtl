@@ -7,22 +7,22 @@
 namespace RTL
 {
 
-template <class Model, class Datum, class Data>
-class LMedS : virtual public RANSAC<Model, Datum, Data>
-{
-public:
-    LMedS(Estimator<Model, Datum, Data>* estimator) : RANSAC<Model, Datum, Data>(estimator) { }
-
-protected:
-    virtual double EvaluateModel(const Model& model, const Data& data, int N)
+    template <class Model, class Datum, class Data>
+    class LMedS : public RANSAC<Model, Datum, Data>
     {
-        std::vector<double> errors(N);
-        for (int i = 0; i < N; i++)
-            errors[i] = fabs(toolEstimator->ComputeError(model, data[i]));
-        std::nth_element(errors.begin(), errors.begin() + N / 2, errors.end());
-        return errors[N / 2];
-    }
-};
+    public:
+        LMedS(Estimator<Model, Datum, Data> *estimator) : RANSAC<Model, Datum, Data>(estimator) {}
+
+    protected:
+        virtual double EvaluateModel(const Model &model, const Data &data, int N)
+        {
+            std::vector<double> errors(N);
+            for (int i = 0; i < N; i++)
+                errors[i] = fabs(this->toolEstimator->ComputeError(model, data[i]));
+            std::nth_element(errors.begin(), errors.begin() + N / 2, errors.end());
+            return errors[N / 2];
+        }
+    };
 
 } // End of 'RTL'
 

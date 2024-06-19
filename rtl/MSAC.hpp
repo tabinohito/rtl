@@ -6,25 +6,27 @@
 namespace RTL
 {
 
-template <class Model, class Datum, class Data>
-class MSAC : virtual public RANSAC<Model, Datum, Data>
-{
-public:
-    MSAC(Estimator<Model, Datum, Data>* estimator) : RANSAC<Model, Datum, Data>(estimator) { }
-
-protected:
-    virtual inline double EvaluateModel(const Model& model, const Data& data, int N)
+    template <class Model, class Datum, class Data>
+    class MSAC : public RANSAC<Model, Datum, Data>
     {
-        double loss = 0;
-        for (int i = 0; i < N; i++)
+    public:
+        MSAC(Estimator<Model, Datum, Data> *estimator) : RANSAC<Model, Datum, Data>(estimator) {}
+
+    protected:
+        virtual inline double EvaluateModel(const Model &model, const Data &data, int N)
         {
-            double error = toolEstimator->ComputeError(model, data[i]);
-            if (error > paramThreshold || error < -paramThreshold) loss += paramThreshold * paramThreshold;
-            else loss += error * error;
+            double loss = 0;
+            for (int i = 0; i < N; i++)
+            {
+                double error = this->toolEstimator->ComputeError(model, data[i]);
+                if (error > this->paramThreshold || error < -(this->paramThreshold))
+                    loss += this->paramThreshold * this->paramThreshold;
+                else
+                    loss += error * error;
+            }
+            return loss;
         }
-        return loss;
-    }
-};
+    };
 
 } // End of 'RTL'
 

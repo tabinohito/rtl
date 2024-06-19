@@ -9,11 +9,11 @@
 class Point
 {
 public:
-    Point() : x(0), y(0) { }
+    Point() : x(0), y(0) {}
 
-    Point(double _x, double _y) : x(_x), y(_y) { }
+    Point(double _x, double _y) : x(_x), y(_y) {}
 
-    friend std::ostream& operator<<(std::ostream& out, const Point& p) { return out << p.x << ", " << p.y; }
+    friend std::ostream &operator<<(std::ostream &out, const Point &p) { return out << p.x << ", " << p.y; }
 
     double x, y;
 };
@@ -21,24 +21,24 @@ public:
 class Line
 {
 public:
-    Line() : a(0), b(0), c(0) { }
+    Line() : a(0), b(0), c(0) {}
 
-    Line(double _a, double _b, double _c) : a(_a), b(_b), c(_c) { }
+    Line(double _a, double _b, double _c) : a(_a), b(_b), c(_c) {}
 
-    friend std::ostream& operator<<(std::ostream& out, const Line& l) { return out << l.a << ", " << l.b << ", " << l.c; }
+    friend std::ostream &operator<<(std::ostream &out, const Line &l) { return out << l.a << ", " << l.b << ", " << l.c; }
 
     double a, b, c;
 };
 
-class LineEstimator : virtual public RTL::Estimator<Line, Point, std::vector<Point> >
+class LineEstimator : virtual public RTL::Estimator<Line, Point, std::vector<Point>>
 {
 public:
-    virtual Line ComputeModel(const std::vector<Point>& data, const std::set<int>& samples)
+    virtual Line ComputeModel(const std::vector<Point> &data, const std::set<int> &samples)
     {
         double meanX = 0, meanY = 0, meanXX = 0, meanYY = 0, meanXY = 0;
         for (auto itr = samples.begin(); itr != samples.end(); itr++)
         {
-            const Point& p = data[*itr];
+            const Point &p = data[*itr];
             meanX += p.x;
             meanY += p.y;
             meanXX += p.x * p.x;
@@ -76,18 +76,18 @@ public:
         return line;
     }
 
-    virtual double ComputeError(const Line& line, const Point& point)
+    virtual double ComputeError(const Line &line, const Point &point)
     {
         return line.a * point.x + line.b * point.y + line.c;
     }
 }; // End of 'LineEstimator'
 
-class LineObserver : virtual public RTL::Observer<Line, Point, std::vector<Point> >
+class LineObserver : virtual public RTL::Observer<Line, Point, std::vector<Point>>
 {
 public:
-    LineObserver(Point _max = Point(640, 480), Point _min = Point(0, 0)) : RANGE_MAX(_max), RANGE_MIN(_min) { }
+    LineObserver(Point _max = Point(640, 480), Point _min = Point(0, 0)) : RANGE_MAX(_max), RANGE_MIN(_min) {}
 
-    virtual std::vector<Point> GenerateData(const Line& line, int N, std::vector<int>& inliers, double noise = 0, double ratio = 1)
+    virtual std::vector<Point> GenerateData(const Line &line, int N, std::vector<int> &inliers, double noise = 0, double ratio = 1)
     {
         std::mt19937 generator;
         std::uniform_real_distribution<double> uniform(0, 1);
