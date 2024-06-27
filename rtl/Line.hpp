@@ -13,6 +13,12 @@ public:
 
     Point(double _x, double _y) : x(_x), y(_y) {}
 
+    // ここに operator== を追加する
+    bool operator==(const Point &other) const
+    {
+        return (x == other.x && y == other.y);
+    }
+
     friend std::ostream &operator<<(std::ostream &out, const Point &p) { return out << p.x << ", " << p.y; }
 
     double x, y;
